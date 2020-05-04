@@ -792,6 +792,46 @@ function rot90 (m, k, axes) {
   }
 }
 
+/**
+ * Calculates the arithmetic mean over a specific axis.
+ * axis := 0 means x-axis (columns)
+ * axis := 1 means y-axis (rows)
+ * @param {NdArray} arr 
+ *  Must be a square matrices or a simple vector.
+ *  If arr is a vector it uses the function mean(...)
+ * @param {Integer} axis (0 or 1)
+ */
+function meanaxis(arr, axis) {
+
+  // precondition
+  if (axis < 0 || axis >= 2) {
+    throw new errors.ValueError("Axis must be 0 or 1");
+  }
+
+  if (arr.shape[0] != arr.shape[1] && arr.shape.length >= 2) {
+    throw new errors.ValueError("The array must be a square array.");
+  }
+
+  const shape = arr.shape;
+  let results = [];
+
+  if (arr.shape.length == 1) { // for simple vectors
+    return mean(arr);
+  } else { // for matrices
+    if (axis == 0) {
+      for (let i = 0; i < shape[0]; i++) {
+        results.push(mean(arr.pick(null, i)));
+      }
+    } else {
+      for (let i = 0; i < shape.length; i++) {
+        results.push(mean(arr.pick(i)));
+      }
+    }
+  }
+
+  return NdArray.new(results);
+}
+
 module.exports = {
   config: CONF,
   dtypes: DTYPES,
@@ -849,6 +889,7 @@ module.exports = {
   identity: identity,
   stack: stack,
   rot90: rot90,
+  meanaxis: meanaxis,
   int8: function (array) { return NdArray.new(array, 'int8'); },
   uint8: function (array) { return NdArray.new(array, 'uint8'); },
   int16: function (array) { return NdArray.new(array, 'int16'); },
